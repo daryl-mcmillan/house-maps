@@ -1,0 +1,8 @@
+{
+	"addressHint": "London, England",
+	"addresses": [
+		{ "address": "Abbey Road", "link": "http://en.wikipedia.org/wiki/Abbey_Road" },
+		{ "address": "London Bridge", "link": "http://en.wikipedia.org/wiki/London_Bridge" },
+		{ "address": "London Eye", "link": "http://en.wikipedia.org/wiki/London_Eye" }
+	]
+}

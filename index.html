@@ -47,21 +47,10 @@ iframe {
 other stuff here
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.0/lodash.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3"></script>
 <script>
-
-var addresses = [
-	{ address: "Abbey Road", link: "http://en.wikipedia.org/wiki/Abbey_Road" },
-	{ address: "London Bridge", link: "http://en.wikipedia.org/wiki/London_Bridge" },
-	{ address: "London Eye", link: "http://en.wikipedia.org/wiki/London_Eye" }
-];
-var addressHint = "London England";
-
-function each( list, func ) {
-	for( var i=0; i<list.length; i++ ) {
-		func( list[i] );
-	}
-}
 
 var geocoder = new google.maps.Geocoder();
 
@@ -90,17 +79,36 @@ function showMap( mapNode, location, addresses ) {
 	);
 	var mapOptions = { zoom: 11, center: location };
 	var map = new google.maps.Map(mapNode, mapOptions);
-	each( addresses, function(addr) { addMarker( map, searchBounds, addr ); } );
+	_.each( addresses, function(addr) { console.log( addr); addMarker( map, searchBounds, addr ); } );
 }
 
-geocoder.geocode( { address: addressHint }, function( results, status ) {
-	if( status != google.maps.GeocoderStatus.OK ) {
-		console.log( "geocode error", addressHint, status, results );
-		return;
-	}
-	var hintLocation = results[0].geometry.location;
-	var mapNode = document.getElementById('map-canvas');
-	showMap( mapNode, hintLocation, addresses );
+var hash = document.location.hash.slice(1);
+var hashParts = hash.split('&');
+var params = {};
+_.each( hashParts, function(part) {
+	var vals = part.split('=');
+	var key = decodeURIComponent( vals[0] );
+	var value = decodeURIComponent( vals.slice(1).join('=') );
+	params[key] = value;
+});
+
+console.log( { params: params } );
+
+var dataUri = params.data || "examples/london.json";
+
+$.get( dataUri, function( data ) {
+	console.log(data);
+	var addressHint = data.addressHint;
+	var addresses = data.addresses;
+	geocoder.geocode( { address: addressHint }, function( results, status ) {
+		if( status != google.maps.GeocoderStatus.OK ) {
+			console.log( "geocode error", addressHint, status, results );
+			return;
+		}
+		var hintLocation = results[0].geometry.location;
+		var mapNode = document.getElementById('map-canvas');
+		showMap( mapNode, hintLocation, addresses );
+	});
 });
 
 </script>
